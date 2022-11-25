@@ -82,7 +82,7 @@ namespace GraphQLinq
                 return "[" + ToGraphQlType(listType) + "]";
             }
 
-            return type.Name;
+            return type.Name + "!";
         }
     }
 }
