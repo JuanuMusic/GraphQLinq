@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Client;
+using GraphQL;
 
 namespace GraphQLinq
 {
@@ -12,6 +11,8 @@ namespace GraphQLinq
     {
         private readonly GraphContext context;
         private readonly string query;
+        IReadOnlyDictionary<string, object> variables;
+        object actualVariables;
         private readonly QueryType queryType;
         private readonly Func<TSource, T> mapper;
         private readonly JsonSerializerOptions jsonSerializerOptions;
@@ -19,12 +20,14 @@ namespace GraphQLinq
         private const string DataPathPropertyName = "data";
         private const string ErrorPathPropertyName = "errors";
 
-        internal GraphQueryExecutor(GraphContext context, string query, QueryType queryType, Func<TSource, T> mapper)
+        internal GraphQueryExecutor(GraphContext context, string query, IReadOnlyDictionary<string, object> variables, QueryType queryType, Func<TSource, T> mapper, object actualVariables)
         {
             this.context = context;
             this.query = query;
             this.mapper = mapper;
             this.queryType = queryType;
+            this.variables = variables;
+            this.actualVariables = actualVariables;
 
             jsonSerializerOptions = context.JsonSerializerOptions;
         }
@@ -45,45 +48,41 @@ namespace GraphQLinq
 
         internal async Task<(T Item, IEnumerable<T> Enumerable)> Execute()
         {
-            using (var content = new StringContent(query, Encoding.UTF8, "application/json"))
+            
+            var dynamicVars = Dict2Obj(variables);
+            var request = new GraphQLRequest { Query = query, Variables = actualVariables } ;
+
+            if (queryType == QueryType.Item)
             {
-                using (var response = await context.HttpClient.PostAsync("", content))
-                {
-                    using (var stream = await response.Content.ReadAsStreamAsync())
-                    {
-                        var document = await JsonDocument.ParseAsync(stream);
-
-                        var hasError = document.RootElement.TryGetProperty(ErrorPathPropertyName, out var errorElement);
-
-                        if (hasError)
-                        {
-                            var errors = errorElement.Deserialize<List<GraphQueryError>>(jsonSerializerOptions);
-                            throw new GraphQueryExecutionException(errors, query);
-                        }
-
-                        var hasData = document.RootElement.TryGetProperty(DataPathPropertyName, out var dataElement);
-
-                        if (!hasData)
-                        {
-                            throw new GraphQueryExecutionException(query);
-                        }
-
-                        var hasResult = dataElement.TryGetProperty(GraphQueryBuilder<T>.ResultAlias, out var resultElement);
-
-                        if (!hasResult)
-                        {
-                            throw new GraphQueryExecutionException(query);
-                        }
-
-                        if (queryType == QueryType.Item)
-                        {
-                            return (JsonElementToItem(resultElement), null);
-                        }
-
-                        return (default, resultElement.EnumerateArray().Select(JsonElementToItem));
-                    }
-                }
+                var response = await context.Client.SendQueryAsync<ResultRoot<T>>(request);
+                return (response.Data.Result, null);
+            } else
+            {
+                var response = await context.Client.SendQueryAsync<ResultRoot<IEnumerable<T>>>(request);
+                return (default(T), response.Data.Result);
             }
+            //// If an error occrrurded
+            //if(response.Errors != null && response.Errors.Length > 0)
+            //    throw new Exception(response.Errors[0].Message);
+
+            //{
+            //    return (response.Data.Result, null);
+            //}
+
+            //return (default, response.Data.Result as IEnumerable<T>);
+            //return (default, resultElement.EnumerateArray().Select(JsonElementToItem));
+        }
+
+        object Dict2Obj(IReadOnlyDictionary<string, object> dict)
+        {
+            dynamic vars = new System.Dynamic.ExpandoObject();
+
+            foreach (var kvp in variables)
+            {
+                ((IDictionary<String, Object>)vars)[kvp.Key] = kvp.Value;
+            }
+
+            return vars;
         }
     }
 }

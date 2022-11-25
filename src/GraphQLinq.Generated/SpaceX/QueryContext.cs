@@ -1,5 +1,6 @@
 namespace SpaceX
 {
+    using GraphQL.Client.Http;
     using GraphQLinq;
     using System;
     using System.Collections.Generic;
@@ -15,14 +16,14 @@ namespace SpaceX
         {
         }
 
-        public QueryContext(HttpClient httpClient) : base(httpClient)
+        public QueryContext(GraphQLHttpClient httpClient) : base(httpClient)
         {
         }
 
         public GraphCollectionQuery<Users> Users(List<Users_select_column> distinct_on, int? limit, int? offset, List<Users_order_by> order_by, Users_bool_exp where)
         {
             var parameterValues = new object[] { distinct_on, limit, offset, order_by, where };
-            return BuildCollectionQuery<Users>(parameterValues, "users");
+            return BuildCollectionQuery<Users>(parameterValues, "users", new { distinct_on, limit, offset, order_by, where });
         }
 
         public GraphItemQuery<Users_aggregate> Users_aggregate(List<Users_select_column> distinct_on, int? limit, int? offset, List<Users_order_by> order_by, Users_bool_exp where)
@@ -190,13 +191,13 @@ namespace SpaceX
         public GraphCollectionQuery<Mission> Missions(MissionsFind find, int? limit, int? offset)
         {
             var parameterValues = new object[] { find, limit, offset };
-            return BuildCollectionQuery<Mission>(parameterValues, "missions");
+            return BuildCollectionQuery<Mission>(parameterValues, "missions", new { find, limit, offset });
         }
 
         public GraphItemQuery<MissionResult> MissionsResult(MissionsFind find, int? limit, int? offset)
         {
             var parameterValues = new object[] { find, limit, offset };
-            return BuildItemQuery<MissionResult>(parameterValues, "missionsResult");
+            return BuildItemQuery<MissionResult>(parameterValues, "missionsResult", new { find, limit, offset });
         }
 
         public GraphItemQuery<Mission> Mission(string id)
@@ -250,7 +251,7 @@ namespace SpaceX
         public GraphItemQuery<ShipsResult> ShipsResult(ShipsFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildItemQuery<ShipsResult>(parameterValues, "shipsResult");
+            return BuildItemQuery<ShipsResult>(parameterValues, "shipsResult", new { find, limit, offset, order, sort });
         }
 
         public GraphItemQuery<Ship> Ship(string id)

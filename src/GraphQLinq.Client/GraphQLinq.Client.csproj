@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageOutputPath>./../output</PackageOutputPath>
@@ -28,12 +28,20 @@
       Migrated from WebClient to HttpClient. 
       Migrated from Newtonsoft.Json to System.Text.Json</PackageReleaseNotes>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AssemblyName>GraphQLinq.Client</AssemblyName>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Text.Json" Version="6.0.5" />
+    <PackageReference Include="GraphQL.Client" Version="5.1.0" />
+    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.0" />
+    <PackageReference Include="System.Text.Json" Version="7.0.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="GraphQL.Client" />
+    <None Remove="GraphQL.Client.Serializer.Newtonsoft" />
+    <None Remove="System.Text.Json" />
+    <None Remove="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\Images\Icon.png">

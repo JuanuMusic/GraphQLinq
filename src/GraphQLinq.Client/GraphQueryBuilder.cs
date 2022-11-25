@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,7 +16,7 @@ namespace GraphQLinq
 
         internal const string ResultAlias = "result";
 
-        public GraphQLQuery BuildQuery(GraphQuery<T> graphQuery, List<IncludeDetails> includes)
+        public GraphQLQuery BuildQuery(GraphQuery<T> graphQuery, List<IncludeDetails> includes, object parameters)
         {
             var selectClause = "";
 
@@ -86,7 +87,7 @@ namespace GraphQLinq
                 Converters = { new JsonStringEnumConverter() }
             });
 
-            return new GraphQLQuery(graphQLQuery, queryVariables, json);
+            return new GraphQLQuery(graphQLQuery, queryVariables, json, parameters);
         }
 
         private static string BuildMemberAccessSelectClause(Expression body, string selectClause, string padding, string alias)
@@ -207,16 +208,18 @@ namespace GraphQLinq
 
     class GraphQLQuery
     {
-        public GraphQLQuery(string query, IReadOnlyDictionary<string, object> variables, string fullQuery)
+        public GraphQLQuery(string query, IReadOnlyDictionary<string, object> variables, string fullQuery, object actualVariables)
         {
             Query = query;
             Variables = variables;
             FullQuery = fullQuery;
+            ActualVariables = actualVariables;
         }
 
         public string Query { get; }
         public string FullQuery { get; }
         public IReadOnlyDictionary<string, object> Variables { get; }
+        public object ActualVariables { get; }
     }
 
     class SelectClauseDetails

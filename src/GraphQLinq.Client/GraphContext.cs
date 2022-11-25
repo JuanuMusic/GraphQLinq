@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
 
 namespace GraphQLinq
 {
@@ -13,21 +15,17 @@ namespace GraphQLinq
     {
         private readonly bool ownsHttpClient = false;
 
-        public HttpClient HttpClient { get; }
+        //public HttpClient HttpClient { get; }
+        public GraphQLHttpClient Client { get; }
 
-        protected GraphContext(HttpClient httpClient)
+        protected GraphContext(GraphQLHttpClient httpClient)
         {
             if (httpClient == null)
             {
                 throw new ArgumentNullException($"{nameof(httpClient)} cannot be empty");
             }
 
-            if (httpClient.BaseAddress == null)
-            {
-                throw new ArgumentException($"{nameof(httpClient.BaseAddress)} cannot be empty");
-            }
-
-            HttpClient = httpClient;
+            Client = httpClient;
         }
 
         protected GraphContext(string baseUrl, string authorization)
@@ -38,16 +36,12 @@ namespace GraphQLinq
             }
 
             ownsHttpClient = true;
-            HttpClient = new HttpClient();
-
-            if (!string.IsNullOrEmpty(baseUrl))
-            {
-                HttpClient.BaseAddress = new Uri(baseUrl);
-            }
+            var serializer = new NewtonsoftJsonSerializer();
+            Client = new GraphQLHttpClient(baseUrl, serializer);
 
             if (!string.IsNullOrEmpty(authorization))
             {
-                HttpClient.DefaultRequestHeaders.Add("Authorization", authorization);
+                Client.HttpClient.DefaultRequestHeaders.Add("Authorization", authorization);
             }
         }
 
@@ -56,16 +50,16 @@ namespace GraphQLinq
             Converters = { new JsonStringEnumConverter() },
         };
 
-        protected GraphCollectionQuery<T> BuildCollectionQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null)
+        protected GraphCollectionQuery<T> BuildCollectionQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null, object variables = null)
         {
             var arguments = BuildDictionary(parameterValues, queryName);
-            return new GraphCollectionQuery<T, T>(this, queryName) { Arguments = arguments };
+            return new GraphCollectionQuery<T, T>(this, queryName, variables) { Arguments = arguments};
         }
 
-        protected GraphItemQuery<T> BuildItemQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null)
+        protected virtual GraphItemQuery<T> BuildItemQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null, object variables = null)
         {
             var arguments = BuildDictionary(parameterValues, queryName);
-            return new GraphItemQuery<T, T>(this, queryName) { Arguments = arguments };
+            return new GraphItemQuery<T, T>(this, queryName, variables) { Arguments = arguments};
         }
 
         private Dictionary<string, object> BuildDictionary(object[] parameterValues, string queryName)
@@ -79,7 +73,7 @@ namespace GraphQLinq
         {
             if (ownsHttpClient)
             {
-                HttpClient.Dispose();
+                Client.Dispose();
             }
         }
     }

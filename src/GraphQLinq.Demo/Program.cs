@@ -66,12 +66,12 @@ namespace GraphQLinq.Demo
 
             #region Multiple levels of Includes
 
-            var launches = await spaceXContext.Launches(null, 10, 0, null, null)
+            var launchesQuery = spaceXContext.Launches(null, 10, 0, null, null)
                                         .Include(launch => launch.Links)
                                         .Include(launch => launch.Rocket)
-                                        .Include(launch => launch.Rocket.Second_stage.Payloads.Select(payload => payload.Manufacturer))
-                                        .ToEnumerable();
+                                        .Include(launch => launch.Rocket.Second_stage.Payloads.Select(payload => payload.Manufacturer));
 
+            var launches = await launchesQuery.ToEnumerable();
             RenderLaunches(launches);
             #endregion
         }

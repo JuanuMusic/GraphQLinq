@@ -17,13 +17,14 @@ namespace GraphQLinq
         internal LambdaExpression Selector { get; private set; }
         internal List<IncludeDetails> Includes { get; private set; } = new List<IncludeDetails>();
         internal Dictionary<string, object> Arguments { get; set; } = new Dictionary<string, object>();
+        internal object Variables { get; }
 
-        internal GraphQuery(GraphContext graphContext, string queryName)
+        internal GraphQuery(GraphContext graphContext, string queryName, object variables)
         {
             QueryName = queryName;
             context = graphContext;
-
-            lazyQuery = new Lazy<GraphQLQuery>(() => queryBuilder.BuildQuery(this, Includes));
+            Variables = variables;
+            lazyQuery = new Lazy<GraphQLQuery>(() => queryBuilder.BuildQuery(this, Includes, variables));
         }
 
         public override string ToString()
@@ -41,7 +42,7 @@ namespace GraphQLinq
             var genericArguments = GetType().GetGenericArguments();
             var cloneType = genericQueryType.MakeGenericType(typeof(TR), genericArguments[1]);
 
-            var instance = (GraphQuery<TR>)Activator.CreateInstance(cloneType, context, QueryName);
+            var instance = (GraphQuery<TR>)Activator.CreateInstance(cloneType, context, QueryName, Variables);
 
             instance.Arguments = Arguments;
             instance.Selector = Selector;
@@ -164,13 +165,13 @@ namespace GraphQLinq
 
             var mapper = (Func<TSource, T>)Selector?.Compile();
 
-            return new GraphQueryExecutor<T, TSource>(context, query.FullQuery, queryType, mapper);
+            return new GraphQueryExecutor<T, TSource>(context, query.Query, query.Variables, queryType, mapper,  query.ActualVariables);
         }
     }
 
     public abstract class GraphItemQuery<T> : GraphQuery<T>
     {
-        protected GraphItemQuery(GraphContext graphContext, string queryName) : base(graphContext, queryName) { }
+        protected GraphItemQuery(GraphContext graphContext, string queryName, object variables) : base(graphContext, queryName, variables) { }
 
         public GraphItemQuery<T> Include<TProperty>(Expression<Func<T, TProperty>> path)
         {
@@ -187,7 +188,7 @@ namespace GraphQLinq
 
     public abstract class GraphCollectionQuery<T> : GraphQuery<T>
     {
-        protected GraphCollectionQuery(GraphContext graphContext, string queryName) : base(graphContext, queryName) { }
+        protected GraphCollectionQuery(GraphContext graphContext, string queryName, object variables) : base(graphContext, queryName, variables) { }
 
         public abstract Task<IEnumerable<T>> ToEnumerable();
 
@@ -204,7 +205,7 @@ namespace GraphQLinq
 
     public class GraphItemQuery<T, TSource> : GraphItemQuery<T>
     {
-        public GraphItemQuery(GraphContext graphContext, string queryName) : base(graphContext, queryName)
+        public GraphItemQuery(GraphContext graphContext, string queryName, object variables) : base(graphContext, queryName, variables)
         {
         }
 
@@ -217,7 +218,7 @@ namespace GraphQLinq
 
     public class GraphCollectionQuery<T, TSource> : GraphCollectionQuery<T>
     {
-        public GraphCollectionQuery(GraphContext graphContext, string queryName) : base(graphContext, queryName)
+        public GraphCollectionQuery(GraphContext graphContext, string queryName, object variables) : base(graphContext, queryName, variables)
         {
         }
 
