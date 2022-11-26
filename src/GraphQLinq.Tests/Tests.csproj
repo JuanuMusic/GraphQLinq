@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6</TargetFramework>
+    <TargetFrameworks>net7</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <AssemblyName>GraphQL.TestServer</AssemblyName>
+    <RootNamespace>GraphQL</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\GraphQLinq.Client\Client.csproj" />
-    <ProjectReference Include="..\GraphQLinq.Generated\Generated.csproj" />
-    <ProjectReference Include="..\GraphQLinq.TestServer\TestServer.csproj" />
-  </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
@@ -19,5 +19,10 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
     <PackageReference Include="NUnit" Version="3.13.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQLinq.Client\Client.csproj" />
+    <ProjectReference Include="..\GraphQLinq.Generated\Generated.csproj" />
+    <ProjectReference Include="..\GraphQLinq.TestServer\GraphQL.TestServer.csproj" />
   </ItemGroup>
 </Project>

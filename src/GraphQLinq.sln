@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo", "GraphQLinq.Demo\Demo.csproj", "{D7CE01EE-342B-4836-BD9E-9BBF09A25263}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "GraphQLinq.Demo\Demo.csproj", "{D7CE01EE-342B-4836-BD9E-9BBF09A25263}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "GraphQLinq.Client\Client.csproj", "{AD9AA002-9EA5-4AA9-A5BD-2CB73E95F60B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "GraphQLinq.Client\Client.csproj", "{AD9AA002-9EA5-4AA9-A5BD-2CB73E95F60B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "GraphQLinq.Tests\Tests.csproj", "{2A292F0E-8ED7-4E4B-A03A-A0C1F6E8F8F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "GraphQLinq.Tests\Tests.csproj", "{2A292F0E-8ED7-4E4B-A03A-A0C1F6E8F8F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Generated", "GraphQLinq.Generated\Generated.csproj", "{3BD98755-AE1B-41DC-A680-DA39B2B1AC4A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scaffolding", "GraphQLinq.Scaffolding\Scaffolding.csproj", "{B16D1D38-3CC3-4F8E-BC7D-5620370662AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scaffolding", "GraphQLinq.Scaffolding\Scaffolding.csproj", "{B16D1D38-3CC3-4F8E-BC7D-5620370662AE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{F272EDAF-1736-4E58-A535-DAAC2EBA0DC4}"
 	ProjectSection(SolutionItems) = preProject
@@ -22,7 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{F2ACC472-9FB9-4688-BC06-5C202F7C20E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestServer", "GraphQLinq.TestServer\TestServer.csproj", "{24253353-E33C-48AD-97B7-F1958FEC3F59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.TestServer", "GraphQLinq.TestServer\GraphQL.TestServer.csproj", "{F2CFD9BE-9D55-4046-90F4-38ED36DAA7D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,10 +52,10 @@ Global
 		{B16D1D38-3CC3-4F8E-BC7D-5620370662AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F2ACC472-9FB9-4688-BC06-5C202F7C20E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F2ACC472-9FB9-4688-BC06-5C202F7C20E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24253353-E33C-48AD-97B7-F1958FEC3F59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24253353-E33C-48AD-97B7-F1958FEC3F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24253353-E33C-48AD-97B7-F1958FEC3F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24253353-E33C-48AD-97B7-F1958FEC3F59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2CFD9BE-9D55-4046-90F4-38ED36DAA7D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2CFD9BE-9D55-4046-90F4-38ED36DAA7D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2CFD9BE-9D55-4046-90F4-38ED36DAA7D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2CFD9BE-9D55-4046-90F4-38ED36DAA7D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

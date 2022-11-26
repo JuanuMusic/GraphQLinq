@@ -17,7 +17,7 @@ namespace GraphQLinq.Tests
         {
             get;
         }
-        
+
         [OneTimeSetUp]
         public async Task RunSever()
         {

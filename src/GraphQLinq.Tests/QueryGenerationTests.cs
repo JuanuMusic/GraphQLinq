@@ -115,7 +115,7 @@ namespace GraphQLinq.Tests
 
             var query = locations.ToString();
 
-            Assert.That(query, Does.Contain("$type: [LocationType]"));
+            Assert.That(query, Does.Contain("$type: [LocationType!]"));
         }
 
         [Test]

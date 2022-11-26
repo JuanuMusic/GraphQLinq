@@ -3,7 +3,6 @@ namespace SpaceX
     using System;
     using System.Collections.Generic;
     using System.Text.Json.Serialization;
-    using Newtonsoft.Json.Converters;
 
     public partial class Roadster
     {
@@ -14,7 +13,6 @@ namespace SpaceX
         public float? Eccentricity { get; set; }
         public float? Epoch_jd { get; set; }
         public float? Inclination { get; set; }
-        [JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime? Launch_date_unix { get; set; }
         public DateTime? Launch_date_utc { get; set; }
         public int? Launch_mass_kg { get; set; }

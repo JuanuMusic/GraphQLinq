@@ -14,7 +14,7 @@ namespace GraphQLinq.Tests
 
         [Test]
         public async Task SelectingNamesReturnsListOfNames()
-        {
+        {   
             var query = hslGraphContext.Stations().Select(l => l.name);
 
             var names = await query.ToEnumerable();

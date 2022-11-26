@@ -2,8 +2,7 @@ namespace SpaceX
 {
     using System;
     using System.Collections.Generic;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
+   
 
     public partial class Launch
     {
@@ -11,7 +10,6 @@ namespace SpaceX
         public string Id { get; set; }
         public bool? Is_tentative { get; set; }
         public DateTime? Launch_date_local { get; set; }
-        [JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime? Launch_date_unix { get; set; }
         public DateTime? Launch_date_utc { get; set; }
         public LaunchSite Launch_site { get; set; }
@@ -21,7 +19,6 @@ namespace SpaceX
         public List<string> Mission_id { get; set; }
         public string Mission_name { get; set; }
         public LaunchRocket Rocket { get; set; }
-        [JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime? Static_fire_date_unix { get; set; }
         public DateTime? Static_fire_date_utc { get; set; }
         public LaunchTelemetry Telemetry { get; set; }
