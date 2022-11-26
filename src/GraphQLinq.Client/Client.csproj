@@ -36,7 +36,7 @@
     <PackageReference Include="System.Text.Json" Version="6.0.5" />
     <PackageReference Include="GraphQL.Client" Version="5.1.0" />
     <PackageReference Include="GraphQL" Version="7.1.1" />
-    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.0" />
+    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="5.1.0" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="GraphQL.Client" />
@@ -44,6 +44,7 @@
     <None Remove="Contexts\" />
     <None Remove="GraphQL" />
     <None Remove="GraphQL.Client.Serializer.Newtonsoft" />
+    <None Remove="GraphQL.Client.Serializer.SystemTextJson" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\Images\Icon.png">

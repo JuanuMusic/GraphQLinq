@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
+using GraphQL.Client.Serializer.SystemTextJson;
 using static GraphQL.Instrumentation.Metrics;
 
 namespace GraphQLinq
@@ -41,7 +41,7 @@ namespace GraphQLinq
             }
 
             ownsHttpClient = true;
-            GraphQLClient = new GraphQLHttpClient(baseUrl, new NewtonsoftJsonSerializer());
+            GraphQLClient = new GraphQLHttpClient(baseUrl, new SystemTextJsonSerializer());
 
             if (!string.IsNullOrEmpty(authorization))
             {

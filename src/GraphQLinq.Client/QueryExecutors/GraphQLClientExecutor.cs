@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL;
-using Newtonsoft.Json;
 
 namespace GraphQLinq
 {
@@ -16,7 +15,6 @@ namespace GraphQLinq
         private readonly GraphQLQuery query;
         private readonly QueryType queryType;
         private readonly Func<TSource, T> mapper;
-        private readonly JsonSerializerOptions jsonSerializerOptions;
 
         private const string DataPathPropertyName = "data";
         private const string ErrorPathPropertyName = "errors";
@@ -27,22 +25,6 @@ namespace GraphQLinq
             this.query = query;
             this.mapper = mapper;
             this.queryType = queryType;
-
-            jsonSerializerOptions = context.JsonSerializerOptions;
-        }
-
-        private T JsonElementToItem(JsonElement jsonElement)
-        {
-            if (mapper != null)
-            {
-                var result = jsonElement.Deserialize<TSource>(jsonSerializerOptions);
-                return mapper.Invoke(result);
-            }
-            else
-            {
-                var result = jsonElement.Deserialize<T>(jsonSerializerOptions);
-                return result;
-            }
         }
 
         public async Task<(T Item, IEnumerable<T> Enumerable)> Execute()
@@ -58,12 +40,10 @@ namespace GraphQLinq
             }
             else
             {
-                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<IEnumerable<object>>>(new GraphQLRequest { Query = query.Query, Variables = query.Variables });
-                var str = JsonConvert.SerializeObject(res.Data.Result);
-                var theObj = JsonConvert.DeserializeObject<IEnumerable<T>>(str);
+                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<IEnumerable<T>>>(new GraphQLRequest { Query = query.Query, Variables = query.Variables });
                 if (res.Errors != null && res.Errors.Length > 0)
                     throw new Exception(res.Errors[0].Message);
-                return (default(T), theObj);
+                return (default(T), res.Data.Result);
             }
         }
     }
