@@ -130,6 +130,44 @@ namespace GraphQLinq.Scaffolding
                 declaration = declaration.AddBaseListTypes(SimpleBaseType(ParseTypeName(@interface.Name)));
             }
 
+            // Union FIelds
+            if(classInfo.Kind == TypeKind.Union && classInfo.PossibleTypes != null)
+            {
+                foreach (var field in classInfo.PossibleTypes)
+                {
+                    var fieldName = field.Name.NormalizeIfNeeded(options);
+
+                    if (fieldName == className)
+                    {
+                        declaration = declaration.ReplaceToken(declaration.Identifier, Identifier($"{className}Type"));
+                        renamedClasses.Add(className, $"{className}Type");
+                    }
+
+                    //string fieldTypeName = field.Name;
+                    //Type fieldType = ;
+                    //if(field.Type != null)
+                    //    (fieldTypeName, _) = GetSharpTypeName(field.Type);
+
+                    //if (NeedsNullable(fieldType, field.Type))
+                    //{
+                    //    fieldTypeName += "?";
+                    //}
+
+                    var property = PropertyDeclaration(ParseTypeName(fieldName), fieldName)
+                                                .AddModifiers(Token(SyntaxKind.PublicKeyword));
+
+                    property = property.AddAccessorListAccessors(AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                                       .WithSemicolonToken(semicolonToken));
+
+                    property = property.AddAccessorListAccessors(AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                                       .WithSemicolonToken(semicolonToken));
+
+                    declaration = declaration.AddMembers(property);
+                }
+
+            }
+
+            // Fields
             foreach (var field in classInfo.Fields ?? classInfo.InputFields ?? new List<Field>())
             {
                 var fieldName = field.Name.NormalizeIfNeeded(options);
@@ -397,7 +435,7 @@ namespace GraphQLinq.Scaffolding
             }
         }
 
-        private (string typeName, Type? typeType) GetSharpTypeName(FieldType? fieldType, bool wrapWithGraphTypes = false)
+        private (string typeName, Type? typeType)   GetSharpTypeName(FieldType? fieldType, bool wrapWithGraphTypes = false)
         {
             if (fieldType == null)
             {

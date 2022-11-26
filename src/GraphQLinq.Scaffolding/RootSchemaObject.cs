@@ -31,6 +31,7 @@ namespace GraphQLinq.Scaffolding
         public List<Field> Fields { get; set; }
         public List<Field> InputFields { get; set; }
         public List<GraphqlType> Interfaces { get; set; }
+        public List<Field> PossibleTypes { get; set; }
     }
 
     [JsonConverter(typeof(JsonStringEnumMemberConverter))]
@@ -70,6 +71,7 @@ namespace GraphQLinq.Scaffolding
         public TypeKind Kind { get; set; }
         public string? Name { get; set; }
         public FieldType? OfType { get; set; }
+        public List<FieldType> PossibleTypes { get; set; }
     }
 
     public class Arg : BaseInfo

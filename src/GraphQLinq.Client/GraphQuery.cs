@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -145,6 +146,22 @@ namespace GraphQLinq
             return graphQuery;
         }
 
+        protected GraphQuery<T> BuildIncludeUnion<TUnion>(Expression<Func<TUnion>> path)
+        {
+            var include = ParseIncludePath(path.Body);
+            if (include?.Path == null)
+            {
+                throw new ArgumentException("Invalid Include Path Expression", nameof(path));
+            }
+
+            var graphQuery = Clone<T>();
+            graphQuery.Includes.Add(include);
+
+            return graphQuery;
+        }
+
+
+
         protected GraphQuery<TResult> BuildSelect<TResult>(Expression<Func<T, TResult>> resultSelector)
         {
             if (resultSelector.NodeType != ExpressionType.Lambda)
@@ -175,6 +192,11 @@ namespace GraphQLinq
         public GraphItemQuery<T> Include<TProperty>(Expression<Func<T, TProperty>> path)
         {
             return (GraphItemQuery<T>)BuildInclude(path);
+        }
+
+        public GraphItemQuery<T> IncludeUnion<TUnion>()
+        {
+            return (GraphItemQuery<T>)BuildIncludeUnion<TUnion>();
         }
 
         public GraphItemQuery<TResult> Select<TResult>(Expression<Func<T, TResult>> resultSelector)

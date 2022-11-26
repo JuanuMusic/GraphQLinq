@@ -4,6 +4,7 @@ using System.CommandLine.Invocation;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -16,101 +17,128 @@ namespace GraphQLinq.Scaffolding
 {
     class Program
     {
-        private const string IntrospectionQuery = @"{
-  __schema {
-    types {
-      name
-      interfaces {
-        name
-      }
-      description
-      kind
-      enumValues {
-        name
-      }
-      description
-      fields {
-        name
-        description
-        type {
-          name
-          kind
-          ofType {
-            name
-            kind
-            ofType {
-              name
-              kind
-              ofType {
-                name
-                kind
-                ofType {
-                  name
-                  kind
-                  ofType {
-                    name
-                    kind
-                  }
-                }
-              }
+//        private const string IntrospectionQuery = @"{
+//  { __schema {
+//    types {
+//      name
+//      interfaces {
+//        name
+//      }
+//      description
+//      kind
+//      enumValues {
+//        name
+//      }
+//      possibleTypes {
+//        name,
+//        fields {
+//          name
+//          type {
+//            name
+//          }
+//        }
+//      }
+//      description
+//      fields {
+//        name
+//        description
+//        type {
+//          name
+//          kind
+//          ofType {
+//            name
+//            kind
+//            ofType {
+//              name
+//              kind
+//              ofType {
+//                name
+//                kind
+//                ofType {
+//                  name
+//                  kind
+//                  ofType {
+//                    name
+//                    kind
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//        args {
+//          name
+//          description
+//          type {
+//            kind
+//            name
+//            description
+//            ofType {
+//              name
+//              kind
+//              ofType {
+//                name
+//                kind
+//                ofType {
+//                  name
+//                  kind
+//                  ofType {
+//                    name
+//                    kind
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//      inputFields {
+//        name
+//        description
+//        type {
+//          name
+//          kind
+//          ofType {
+//            name
+//            kind
+//            ofType {
+//              name
+//              kind
+//              ofType {
+//                name
+//                kind
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//    queryType {
+//      name
+//    }
+//    mutationType {
+//      name
+//    }
+//    subscriptionType {
+//      name
+//    }
+//  }
+//}
+//";
+
+        private static string LoqdIntrospectionQuery()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "GraphQLinq.Scaffolding.Queries.Introspection.graphql";
+
+            string query = String.Empty;
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                query = reader.ReadToEnd();
             }
-          }
+            return query;
         }
-        args {
-          name
-          description
-          type {
-            kind
-            name
-            description
-            ofType {
-              name
-              kind
-              ofType {
-                name
-                kind
-                ofType {
-                  name
-                  kind
-                }
-              }
-            }
-          }
-        }
-      }
-      inputFields {
-        name
-        description
-        type {
-          name
-          kind
-          ofType {
-            name
-            kind
-            ofType {
-              name
-              kind
-              ofType {
-                name
-                kind
-              }
-            }
-          }
-        }
-      }
-    }
-    queryType {
-      name
-    }
-    mutationType {
-      name
-    }
-    subscriptionType {
-      name
-    }
-  }
-}
-";
 
         private static async Task Main(string[] args)
         {
@@ -148,7 +176,7 @@ namespace GraphQLinq.Scaffolding
                     GraphQLHttpClient client = new GraphQLHttpClient(endpoint, new SystemTextJsonSerializer());
                     var request = new GraphQLRequest
                     {
-                        Query = IntrospectionQuery
+                        Query = Program.LoqdIntrospectionQuery()
                     };
                     var responseMessage = await client.SendQueryAsync<Data>(request);
 

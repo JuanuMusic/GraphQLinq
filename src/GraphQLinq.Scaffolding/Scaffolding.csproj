@@ -49,6 +49,8 @@
     <None Remove="GraphQL.Client" />
     <None Remove="GraphQL.Client.Serializer.Newtonsoft" />
     <None Remove="GraphQL.Client.Serializer.SystemTextJson" />
+    <None Remove="Queries\" />
+    <None Remove="Queries\Introspection.graphql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\Images\Icon.png">
@@ -63,5 +65,13 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Queries\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Queries\Introspection.graphql">
+      <LogicalName>GraphQLinq.Scaffolding.Queries.Introspection.graphql</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
