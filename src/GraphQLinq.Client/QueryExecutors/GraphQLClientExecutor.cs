@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL;
+using Newtonsoft.Json;
 
 namespace GraphQLinq
 {
@@ -57,10 +58,12 @@ namespace GraphQLinq
             }
             else
             {
-                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<IEnumerable<T>>>(new GraphQLRequest { Query = query });
+                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<IEnumerable<object>>>(new GraphQLRequest { Query = query });
+                var str = JsonConvert.SerializeObject(res.Data.Result);
+                var theObj = JsonConvert.DeserializeObject<IEnumerable<T>>(str);
                 if (res.Errors != null && res.Errors.Length > 0)
                     throw new Exception(res.Errors[0].Message);
-                return (default(T), res.Data.Result);
+                return (default(T), theObj);
             }
         }
     }
