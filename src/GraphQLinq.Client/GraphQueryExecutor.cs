@@ -48,8 +48,6 @@ namespace GraphQLinq
 
         internal async Task<(T Item, IEnumerable<T> Enumerable)> Execute()
         {
-            
-            var dynamicVars = Dict2Obj(variables);
             var request = new GraphQLRequest { Query = query, Variables = actualVariables } ;
 
             if (queryType == QueryType.Item)

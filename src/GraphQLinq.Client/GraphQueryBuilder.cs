@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+//using Newtonsoft.Json;
 
 namespace GraphQLinq
 {
@@ -16,12 +17,28 @@ namespace GraphQLinq
 
         internal const string ResultAlias = "result";
 
-        public GraphQLQuery BuildQuery(GraphQuery<T> graphQuery, List<IncludeDetails> includes, object parameters)
+        public string BuildQueryNew<TParams>(GraphQuery<T> graphQuery, List<IncludeDetails> includes, TParams parameters) where TParams : class
+        {
+            var selectProperties = typeof(T).GetProperties();
+
+            IQuery<T> query = new Query<T>(graphQuery.QueryName);
+            foreach (var property in selectProperties)
+            {
+                query.AddField(property.Name);
+            }
+
+            var q = query.Build();
+            var parsed = Parser.Parse("query " + q);
+            return q;
+        }
+
+        public GraphQLQuery BuildQuery<TParams>(GraphQuery<T> graphQuery, List<IncludeDetails> includes, TParams parameters)
         {
             var selectClause = "";
 
-            var passedArguments = graphQuery.Arguments.Where(pair => pair.Value != null).ToList();
-            var queryVariables = passedArguments.ToDictionary(pair => pair.Key, pair => pair.Value);
+            var properties = parameters.GetType().GetProperties();
+            var passedArguments = properties.Where(property => property.GetValue(parameters) != null).ToList();
+            var queryVariables = passedArguments.ToDictionary(property => property.Name, property => property.GetValue(parameters));
 
             if (graphQuery.Selector != null)
             {
@@ -73,7 +90,7 @@ namespace GraphQLinq
             var isScalarQuery = string.IsNullOrEmpty(selectClause);
             selectClause = Environment.NewLine + selectClause + Environment.NewLine;
 
-            var queryParameters = passedArguments.Any() ? $"({string.Join(", ", passedArguments.Select(pair => $"{pair.Key}: ${pair.Key}"))})" : "";
+            var queryParameters = passedArguments.Any() ? $"({string.Join(", ", passedArguments.Select(pair => $"{pair.Name}: ${pair.Name}"))})" : "";
             var queryParameterTypes = queryVariables.Any() ? $"({string.Join(", ", queryVariables.Select(pair => $"${pair.Key}: {pair.Value.GetType().ToGraphQlType()}"))})" : "";
 
             var graphQLQuery = string.Format(isScalarQuery ? ScalarQueryTemplate : QueryTemplate, queryParameterTypes, ResultAlias, graphQuery.QueryName, queryParameters, selectClause);
