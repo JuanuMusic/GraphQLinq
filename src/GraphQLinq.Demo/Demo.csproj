@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <AssemblyName>GraphQL.Demo</AssemblyName>
+    <AssemblyName>GraphQLinq.Demo</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQLinq.Client\Client.csproj" />
