@@ -6,12 +6,14 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static System.Collections.Specialized.BitVector32;
 
 namespace GraphQLinq
 {
     public class GraphContext : IGraphContext
     {
         private readonly bool ownsHttpClient = false;
+        private HttpClientHandler clientHandler;
 
         public HttpClient HttpClient { get; }
 
@@ -38,7 +40,9 @@ namespace GraphQLinq
             }
 
             ownsHttpClient = true;
+
             HttpClient = new HttpClient();
+            HttpClient.DefaultRequestHeaders.Add("User-agent","Other");
 
             if (!string.IsNullOrEmpty(baseUrl))
             {
