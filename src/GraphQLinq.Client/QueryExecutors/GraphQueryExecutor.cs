@@ -45,9 +45,10 @@ namespace GraphQLinq
 
         public async Task<(T Item, IEnumerable<T> Enumerable)> Execute()
         {
-            using (var content = new StringContent(query.FullQuery, Encoding.UTF8, "application/json"))
+            string strQuery = query.FullQuery.Replace("\\n", " ");
+            using (var content = new StringContent(strQuery, Encoding.UTF8, "application/json"))
             {
-                using (var response = await context.HttpClient.PostAsync("", content))
+                using (var response = await context.HttpClient.PostAsync("/", content))
                 {
                     using (var stream = await response.Content.ReadAsStreamAsync())
                     {
