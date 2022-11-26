@@ -9,7 +9,7 @@ namespace GraphQLinq
 {
     public abstract class GraphQuery<T>
     {
-        private readonly GraphContext context;
+        private readonly IGraphContext context;
         private readonly Lazy<GraphQLQuery> lazyQuery;
         private readonly GraphQueryBuilder<T> queryBuilder = new GraphQueryBuilder<T>();
 
@@ -18,7 +18,7 @@ namespace GraphQLinq
         internal List<IncludeDetails> Includes { get; private set; } = new List<IncludeDetails>();
         internal Dictionary<string, object> Arguments { get; set; } = new Dictionary<string, object>();
 
-        internal GraphQuery(GraphContext graphContext, string queryName)
+        internal GraphQuery(IGraphContext graphContext, string queryName)
         {
             QueryName = queryName;
             context = graphContext;
@@ -158,19 +158,19 @@ namespace GraphQLinq
             return graphQuery;
         }
 
-        internal GraphQueryExecutor<T, TSource> BuildExecutor<TSource>(QueryType queryType)
+        internal IQueryExecutor<T, TSource> BuildExecutor<TSource>(QueryType queryType)
         {
             var query = lazyQuery.Value;
 
             var mapper = (Func<TSource, T>)Selector?.Compile();
 
-            return new GraphQueryExecutor<T, TSource>(context, query.FullQuery, queryType, mapper);
+            return context.BuildExecutor<T, TSource>(query.Query, queryType, mapper);
         }
     }
 
     public abstract class GraphItemQuery<T> : GraphQuery<T>
     {
-        protected GraphItemQuery(GraphContext graphContext, string queryName) : base(graphContext, queryName) { }
+        protected GraphItemQuery(IGraphContext graphContext, string queryName) : base(graphContext, queryName) { }
 
         public GraphItemQuery<T> Include<TProperty>(Expression<Func<T, TProperty>> path)
         {
@@ -187,7 +187,7 @@ namespace GraphQLinq
 
     public abstract class GraphCollectionQuery<T> : GraphQuery<T>
     {
-        protected GraphCollectionQuery(GraphContext graphContext, string queryName) : base(graphContext, queryName) { }
+        protected GraphCollectionQuery(IGraphContext graphContext, string queryName) : base(graphContext, queryName) { }
 
         public abstract Task<IEnumerable<T>> ToEnumerable();
 
@@ -204,7 +204,7 @@ namespace GraphQLinq
 
     public class GraphItemQuery<T, TSource> : GraphItemQuery<T>
     {
-        public GraphItemQuery(GraphContext graphContext, string queryName) : base(graphContext, queryName)
+        public GraphItemQuery(IGraphContext graphContext, string queryName) : base(graphContext, queryName)
         {
         }
 
@@ -217,7 +217,7 @@ namespace GraphQLinq
 
     public class GraphCollectionQuery<T, TSource> : GraphCollectionQuery<T>
     {
-        public GraphCollectionQuery(GraphContext graphContext, string queryName) : base(graphContext, queryName)
+        public GraphCollectionQuery(IGraphContext graphContext, string queryName) : base(graphContext, queryName)
         {
         }
 
@@ -228,7 +228,7 @@ namespace GraphQLinq
         }
     }
 
-    internal enum QueryType
+    public enum QueryType
     {
         Item,
         Collection

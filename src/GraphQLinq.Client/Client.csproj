@@ -34,6 +34,16 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Text.Json" Version="6.0.5" />
+    <PackageReference Include="GraphQL.Client" Version="5.1.0" />
+    <PackageReference Include="GraphQL" Version="7.1.1" />
+    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="GraphQL.Client" />
+    <None Remove="QueryExecutors\" />
+    <None Remove="Contexts\" />
+    <None Remove="GraphQL" />
+    <None Remove="GraphQL.Client.Serializer.Newtonsoft" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\Images\Icon.png">
@@ -48,5 +58,9 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="QueryExecutors\" />
+    <Folder Include="Contexts\" />
   </ItemGroup>
 </Project>

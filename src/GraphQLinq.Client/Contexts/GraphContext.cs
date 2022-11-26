@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 
 namespace GraphQLinq
 {
-    public class GraphContext : IDisposable
+    public class GraphContext : IGraphContext
     {
         private readonly bool ownsHttpClient = false;
 
@@ -56,13 +56,13 @@ namespace GraphQLinq
             Converters = { new JsonStringEnumConverter() },
         };
 
-        protected GraphCollectionQuery<T> BuildCollectionQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null)
+        public GraphCollectionQuery<T> BuildCollectionQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null)
         {
             var arguments = BuildDictionary(parameterValues, queryName);
             return new GraphCollectionQuery<T, T>(this, queryName) { Arguments = arguments };
         }
 
-        protected GraphItemQuery<T> BuildItemQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null)
+        public GraphItemQuery<T> BuildItemQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null)
         {
             var arguments = BuildDictionary(parameterValues, queryName);
             return new GraphItemQuery<T, T>(this, queryName) { Arguments = arguments };
@@ -82,5 +82,8 @@ namespace GraphQLinq
                 HttpClient.Dispose();
             }
         }
+
+        public IQueryExecutor<T, TSource> BuildExecutor<T, TSource>(string query, QueryType queryType, Func<TSource, T> mapper)
+            => new GraphQueryExecutor<T, TSource>(this, query, queryType, mapper);
     }
 }

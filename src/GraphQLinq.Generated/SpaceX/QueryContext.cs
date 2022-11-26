@@ -1,11 +1,12 @@
 namespace SpaceX
 {
+    using GraphQL.Client.Http;
     using GraphQLinq;
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
 
-    public partial class QueryContext : GraphContext
+    public partial class QueryContext : GraphQLClientContext
     {
         public QueryContext() : this("https://api.spacex.land/graphql")
         {
@@ -15,7 +16,7 @@ namespace SpaceX
         {
         }
 
-        public QueryContext(HttpClient httpClient) : base(httpClient)
+        public QueryContext(GraphQLHttpClient gqlClient) : base(gqlClient)
         {
         }
 

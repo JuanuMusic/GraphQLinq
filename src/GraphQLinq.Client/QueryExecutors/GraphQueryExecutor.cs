@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GraphQLinq
 {
-    class GraphQueryExecutor<T, TSource>
+    public class GraphQueryExecutor<T, TSource> :IQueryExecutor<T, TSource>
     {
         private readonly GraphContext context;
         private readonly string query;
@@ -43,7 +43,7 @@ namespace GraphQLinq
             }
         }
 
-        internal async Task<(T Item, IEnumerable<T> Enumerable)> Execute()
+        public async Task<(T Item, IEnumerable<T> Enumerable)> Execute()
         {
             using (var content = new StringContent(query, Encoding.UTF8, "application/json"))
             {
