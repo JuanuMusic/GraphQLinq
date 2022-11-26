@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
+//using Microsoft.CodeAnalysis.Formatting;
 using Spectre.Console;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -267,6 +269,21 @@ namespace GraphQLinq.Scaffolding
             return topLevelDeclaration;
         }
 
+        private FieldType? GuessInputField(FieldType f)
+        {
+            if (f.Kind == TypeKind.InputObject) return f;
+            if (f.Kind == TypeKind.Scalar) return f;
+            if (f.OfType != null) return GuessInputField(f.OfType);
+            return null;
+        }
+
+        private Type GetArgumentType(Arg arg)
+        {
+            (string typeName, Type type) = GetSharpTypeName(arg.Type);
+
+            return type;
+        }
+
         private SyntaxNode GenerateGraphContext(GraphqlType queryInfo, string endpointUrl)
         {
             var topLevelDeclaration = RoslynUtilities.GetTopLevelNode(options.Namespace).AddUsings(UsingDirective(IdentifierName("GraphQLinq")));
@@ -294,13 +311,13 @@ namespace GraphQLinq.Scaffolding
                                     .WithInitializer(baseInitializer)
                                     .WithBody(Block());
 
-            var baseHttpClientInitializer = ConstructorInitializer(SyntaxKind.BaseConstructorInitializer)
-                                    .AddArgumentListArguments(Argument(IdentifierName("httpClient")));
+            var baseGraphQLHttpClientInitializer = ConstructorInitializer(SyntaxKind.BaseConstructorInitializer)
+                                    .AddArgumentListArguments(Argument(IdentifierName("graphQLClient")));
 
             var httpClientConstructorDeclaration = ConstructorDeclaration(className)
                                     .AddModifiers(Token(SyntaxKind.PublicKeyword))
-                                    .AddParameterListParameters(Parameter(Identifier("httpClient")).WithType(ParseTypeName("HttpClient")))
-                                    .WithInitializer(baseHttpClientInitializer)
+                                    .AddParameterListParameters(Parameter(Identifier("graphQLClient")).WithType(ParseTypeName("GraphQLHttpClient")))
+                                    .WithInitializer(baseGraphQLHttpClientInitializer)
                                     .WithBody(Block());
 
             declaration = declaration.AddMembers(defaultConstructorDeclaration, baseUrlConstructorDeclaration, httpClientConstructorDeclaration);
@@ -323,7 +340,8 @@ namespace GraphQLinq.Scaffolding
                                             .AddModifiers(Token(SyntaxKind.PublicKeyword));
 
                 var methodParameters = new List<ParameterSyntax>();
-
+                var variablesArguments = new List<ArgumentSyntax>();
+                var typeArguments = new List<string>();
                 var initializer = InitializerExpression(SyntaxKind.ArrayInitializerExpression);
 
                 foreach (var arg in field.Args)
@@ -337,24 +355,41 @@ namespace GraphQLinq.Scaffolding
 
                     var parameterSyntax = Parameter(Identifier(arg.Name)).WithType(ParseTypeName(fieldTypeName));
                     methodParameters.Add(parameterSyntax);
+                    variablesArguments.Add(Argument(IdentifierName(arg.Name)));
 
                     initializer = initializer.AddExpressions(IdentifierName(arg.Name));
+
+                    var typeArgument = GetArgumentType(arg);
+                    if(typeArgument!= null) {
+                        typeArguments.Add(typeArgument.Name);
+                    }
+                }
+
+                if (typeArguments.Count > 0)
+                {
+                    var types = string.Join(',', typeArguments);
+                   baseMethodName = baseMethodName.Replace(">", "," + types + ">");
                 }
 
                 var paramsArray = ArrayCreationExpression(ArrayType(ParseTypeName("object[]")), initializer);
 
-                var parametersDeclaration = LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
-                                            .WithVariables(SingletonSeparatedList(VariableDeclarator(Identifier("parameterValues"))
-                                            .WithInitializer(EqualsValueClause(paramsArray)))));
 
-                var parametersArgument = Argument(IdentifierName("parameterValues"));
+                //var parametersDeclaration = LocalDeclarationStatement(VariableDeclaration(IdentifierName("var"))
+                //                            .WithVariables(SingletonSeparatedList(VariableDeclarator(Identifier("parameterValues"))
+                //                            .WithInitializer(EqualsValueClause(paramsArray)))));
+
+                //var parametersArgument = Argument(IdentifierName("parameterValues"));
                 var argumentSyntax = Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal($"{field.Name}")));
 
+                var methodArguments = new List<ArgumentSyntax> { argumentSyntax };
+                methodArguments.AddRange(variablesArguments);
+
                 var returnStatement = ReturnStatement(InvocationExpression(IdentifierName(baseMethodName))
-                                            .WithArgumentList(ArgumentList(SeparatedList(new List<ArgumentSyntax> { parametersArgument, argumentSyntax }))));
+                                            .WithArgumentList(ArgumentList(SeparatedList(methodArguments))));
 
                 methodDeclaration = methodDeclaration.AddParameterListParameters(methodParameters.ToArray())
-                                                        .WithBody(Block(parametersDeclaration, returnStatement));
+                                                        .WithBody(Block(returnStatement));
+
 
                 declaration = declaration.AddMembers(methodDeclaration);
             }
@@ -364,6 +399,7 @@ namespace GraphQLinq.Scaffolding
                 topLevelDeclaration = topLevelDeclaration.AddUsings(UsingDirective(IdentifierName(@using)));
             }
             topLevelDeclaration = topLevelDeclaration.AddUsings(UsingDirective(IdentifierName("System.Net.Http")));
+            topLevelDeclaration = topLevelDeclaration.AddUsings(UsingDirective(IdentifierName("GraphQL.Client.Http")));
 
             topLevelDeclaration = topLevelDeclaration.AddMembers(declaration);
 

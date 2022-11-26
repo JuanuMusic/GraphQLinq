@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using GraphQL.Client.Serializer.Newtonsoft;
+using GraphQL.Query.Builder;
+using GraphQLParser;
 //using Newtonsoft.Json;
 
 namespace GraphQLinq
@@ -27,6 +31,10 @@ namespace GraphQLinq
                 query.AddField(property.Name);
             }
 
+            if(parameters != null)
+            {
+                query.AddArguments(parameters);
+            }
             var q = query.Build();
             var parsed = Parser.Parse("query " + q);
             return q;

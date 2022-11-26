@@ -36,12 +36,16 @@
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.0" />
     <PackageReference Include="System.Text.Json" Version="7.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="GraphQL.Query.Builder" Version="2.0.1" />
+    <PackageReference Include="GraphQL-Parser" Version="8.1.0" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="GraphQL.Client" />
     <None Remove="GraphQL.Client.Serializer.Newtonsoft" />
     <None Remove="System.Text.Json" />
     <None Remove="Microsoft.CSharp" />
+    <None Remove="GraphQL.Query.Builder" />
+    <None Remove="GraphQL-Parser" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\Images\Icon.png">

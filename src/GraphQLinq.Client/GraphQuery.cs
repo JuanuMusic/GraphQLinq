@@ -10,13 +10,13 @@ namespace GraphQLinq
     public abstract class GraphQuery<T>
     {
         private readonly GraphContext context;
-        private readonly Lazy<GraphQLQuery> lazyQuery;
+        private readonly Lazy<string> lazyQuery;
         private readonly GraphQueryBuilder<T> queryBuilder = new GraphQueryBuilder<T>();
 
         internal string QueryName { get; }
         internal LambdaExpression Selector { get; private set; }
         internal List<IncludeDetails> Includes { get; private set; } = new List<IncludeDetails>();
-        internal Dictionary<string, object> Arguments { get; set; } = new Dictionary<string, object>();
+        //internal Dictionary<string, object> Arguments { get; set; } = new Dictionary<string, object>();
         internal object Variables { get; }
 
         internal GraphQuery(GraphContext graphContext, string queryName, object variables)
@@ -24,17 +24,17 @@ namespace GraphQLinq
             QueryName = queryName;
             context = graphContext;
             Variables = variables;
-            lazyQuery = new Lazy<GraphQLQuery>(() => queryBuilder.BuildQuery(this, Includes, variables));
+            lazyQuery = new Lazy<string>(() => queryBuilder.BuildQueryNew(this, Includes, variables));
         }
 
         public override string ToString()
         {
-            return lazyQuery.Value.FullQuery;
+            return lazyQuery.Value;
         }
 
-        public string Query => lazyQuery.Value.Query;
+        public string Query => lazyQuery.Value;
 
-        public IReadOnlyDictionary<string, object> QueryVariables => lazyQuery.Value.Variables;
+        //public IReadOnlyDictionary<string, object> QueryVariables => lazyQuery.Value;
 
         protected GraphQuery<TR> Clone<TR>()
         {
@@ -44,7 +44,7 @@ namespace GraphQLinq
 
             var instance = (GraphQuery<TR>)Activator.CreateInstance(cloneType, context, QueryName, Variables);
 
-            instance.Arguments = Arguments;
+            //instance.Arguments = Arguments;
             instance.Selector = Selector;
             instance.Includes = Includes.ToList();
 
@@ -165,7 +165,7 @@ namespace GraphQLinq
 
             var mapper = (Func<TSource, T>)Selector?.Compile();
 
-            return new GraphQueryExecutor<T, TSource>(context, query.Query, query.Variables, queryType, mapper,  query.ActualVariables);
+            return new GraphQueryExecutor<T, TSource>(context, query, null, queryType, mapper,  null);
         }
     }
 

@@ -50,16 +50,24 @@ namespace GraphQLinq
             Converters = { new JsonStringEnumConverter() },
         };
 
-        protected GraphCollectionQuery<T> BuildCollectionQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null, object variables = null)
+        protected GraphCollectionQuery<T> BuildCollectionQuery<T, TInput>([CallerMemberName] string queryName = null, TInput variables = default(TInput))
         {
-            var arguments = BuildDictionary(parameterValues, queryName);
-            return new GraphCollectionQuery<T, T>(this, queryName, variables) { Arguments = arguments};
+            return new GraphCollectionQuery<T, T>(this, queryName, variables);
         }
 
-        protected virtual GraphItemQuery<T> BuildItemQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null, object variables = null)
+        protected GraphCollectionQuery<T> BuildCollectionQuery<T>([CallerMemberName] string queryName = null)
         {
-            var arguments = BuildDictionary(parameterValues, queryName);
-            return new GraphItemQuery<T, T>(this, queryName, variables) { Arguments = arguments};
+            return new GraphCollectionQuery<T, T>(this, queryName, null);
+        }
+
+        protected virtual GraphItemQuery<T> BuildItemQuery<T, TInput>([CallerMemberName] string queryName = null, TInput variables = default(TInput))
+        {
+            return new GraphItemQuery<T, T>(this, queryName, variables);
+        }
+
+        protected virtual GraphItemQuery<T> BuildItemQuery<T>([CallerMemberName] string queryName = null)
+        {
+            return new GraphItemQuery<T, T>(this, queryName, null);
         }
 
         private Dictionary<string, object> BuildDictionary(object[] parameterValues, string queryName)
