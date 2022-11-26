@@ -83,7 +83,7 @@ namespace GraphQLinq
             }
         }
 
-        public IQueryExecutor<T, TSource> BuildExecutor<T, TSource>(string query, QueryType queryType, Func<TSource, T> mapper)
+        public IQueryExecutor<T, TSource> BuildExecutor<T, TSource>(GraphQLQuery query, QueryType queryType, Func<TSource, T> mapper)
             => new GraphQLClientExecutor<T, TSource>(this, query, queryType, mapper);
     }   
 }

@@ -13,7 +13,7 @@ namespace GraphQLinq
 	public class GraphQLClientExecutor<T, TSource> : IQueryExecutor<T, TSource>
 	{
         private readonly GraphQLClientContext context;
-        private readonly string query;
+        private readonly GraphQLQuery query;
         private readonly QueryType queryType;
         private readonly Func<TSource, T> mapper;
         private readonly JsonSerializerOptions jsonSerializerOptions;
@@ -21,7 +21,7 @@ namespace GraphQLinq
         private const string DataPathPropertyName = "data";
         private const string ErrorPathPropertyName = "errors";
 
-        internal GraphQLClientExecutor(GraphQLClientContext context, string query, QueryType queryType, Func<TSource, T> mapper)
+        internal GraphQLClientExecutor(GraphQLClientContext context, GraphQLQuery query, QueryType queryType, Func<TSource, T> mapper)
         {
             this.context = context;
             this.query = query;
@@ -50,7 +50,7 @@ namespace GraphQLinq
             if (queryType == QueryType.Item)
             {
 
-                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<T>>(new GraphQLRequest { Query = query });
+                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<T>>(new GraphQLRequest { Query = query.Query, Variables = query.Variables });
                 if(res.Errors != null && res.Errors.Length > 0)
                     throw new Exception(res.Errors[0].Message);
                 
@@ -58,7 +58,7 @@ namespace GraphQLinq
             }
             else
             {
-                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<IEnumerable<object>>>(new GraphQLRequest { Query = query });
+                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<IEnumerable<object>>>(new GraphQLRequest { Query = query.Query, Variables = query.Variables });
                 var str = JsonConvert.SerializeObject(res.Data.Result);
                 var theObj = JsonConvert.DeserializeObject<IEnumerable<T>>(str);
                 if (res.Errors != null && res.Errors.Length > 0)

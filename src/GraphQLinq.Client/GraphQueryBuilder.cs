@@ -205,7 +205,7 @@ namespace GraphQLinq
         }
     }
 
-    class GraphQLQuery
+    public class GraphQLQuery
     {
         public GraphQLQuery(string query, IReadOnlyDictionary<string, object> variables, string fullQuery)
         {

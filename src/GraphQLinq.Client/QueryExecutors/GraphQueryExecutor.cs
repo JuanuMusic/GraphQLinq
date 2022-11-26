@@ -11,7 +11,7 @@ namespace GraphQLinq
     public class GraphQueryExecutor<T, TSource> :IQueryExecutor<T, TSource>
     {
         private readonly GraphContext context;
-        private readonly string query;
+        private readonly GraphQLQuery query;
         private readonly QueryType queryType;
         private readonly Func<TSource, T> mapper;
         private readonly JsonSerializerOptions jsonSerializerOptions;
@@ -19,7 +19,7 @@ namespace GraphQLinq
         private const string DataPathPropertyName = "data";
         private const string ErrorPathPropertyName = "errors";
 
-        internal GraphQueryExecutor(GraphContext context, string query, QueryType queryType, Func<TSource, T> mapper)
+        internal GraphQueryExecutor(GraphContext context, GraphQLQuery query, QueryType queryType, Func<TSource, T> mapper)
         {
             this.context = context;
             this.query = query;
@@ -45,7 +45,7 @@ namespace GraphQLinq
 
         public async Task<(T Item, IEnumerable<T> Enumerable)> Execute()
         {
-            using (var content = new StringContent(query, Encoding.UTF8, "application/json"))
+            using (var content = new StringContent(query.FullQuery, Encoding.UTF8, "application/json"))
             {
                 using (var response = await context.HttpClient.PostAsync("", content))
                 {
@@ -58,21 +58,21 @@ namespace GraphQLinq
                         if (hasError)
                         {
                             var errors = errorElement.Deserialize<List<GraphQueryError>>(jsonSerializerOptions);
-                            throw new GraphQueryExecutionException(errors, query);
+                            throw new GraphQueryExecutionException(errors, query.FullQuery);
                         }
 
                         var hasData = document.RootElement.TryGetProperty(DataPathPropertyName, out var dataElement);
 
                         if (!hasData)
                         {
-                            throw new GraphQueryExecutionException(query);
+                            throw new GraphQueryExecutionException(query.FullQuery);
                         }
 
                         var hasResult = dataElement.TryGetProperty(GraphQueryBuilder<T>.ResultAlias, out var resultElement);
 
                         if (!hasResult)
                         {
-                            throw new GraphQueryExecutionException(query);
+                            throw new GraphQueryExecutionException(query.FullQuery);
                         }
 
                         if (queryType == QueryType.Item)

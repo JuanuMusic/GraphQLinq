@@ -164,7 +164,7 @@ namespace GraphQLinq
 
             var mapper = (Func<TSource, T>)Selector?.Compile();
 
-            return context.BuildExecutor<T, TSource>(query.Query, queryType, mapper);
+            return context.BuildExecutor<T, TSource>(query, queryType, mapper);
         }
     }
 

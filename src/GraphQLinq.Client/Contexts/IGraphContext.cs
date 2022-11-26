@@ -11,7 +11,7 @@ namespace GraphQLinq
 
         GraphItemQuery<T> BuildItemQuery<T>(object[] parameterValues, [CallerMemberName] string queryName = null);
 
-        IQueryExecutor<T, TSource> BuildExecutor<T, TSource>(string query, QueryType queryType, Func<TSource, T> mapper);
+        IQueryExecutor<T, TSource> BuildExecutor<T, TSource>(GraphQLQuery query, QueryType queryType, Func<TSource, T> mapper);
     }
 }
 
