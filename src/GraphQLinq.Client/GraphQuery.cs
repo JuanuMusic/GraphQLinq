@@ -17,6 +17,7 @@ namespace GraphQLinq
         internal string QueryName { get; }
         internal LambdaExpression Selector { get; private set; }
         internal List<IncludeDetails> Includes { get; private set; } = new List<IncludeDetails>();
+        internal List<Type> Unions { get; private set; } = new List<Type>();
         internal Dictionary<string, object> Arguments { get; set; } = new Dictionary<string, object>();
 
         internal GraphQuery(IGraphContext graphContext, string queryName)
@@ -24,7 +25,7 @@ namespace GraphQLinq
             QueryName = queryName;
             context = graphContext;
 
-            lazyQuery = new Lazy<GraphQLQuery>(() => queryBuilder.BuildQuery(this, Includes));
+            lazyQuery = new Lazy<GraphQLQuery>(() => queryBuilder.BuildQuery(this, Includes, Unions));
         }
 
         public override string ToString()
@@ -51,14 +52,27 @@ namespace GraphQLinq
             return instance;
         }
 
-        internal static IncludeDetails ParseIncludePath(Expression expression)
+        internal static IncludeDetails ParseIncludePathForPossibleTypes(Expression expression)
         {
             string path = null;
             var withoutConvert = expression.RemoveConvert(); // Removes boxing
             var memberExpression = withoutConvert as MemberExpression;
             var callExpression = withoutConvert as MethodCallExpression;
 
-            if (memberExpression != null)
+            
+            return new IncludeDetails {  Path = path};
+        }
+
+        internal static IncludeDetails ParseIncludePath(Expression expression)
+        {
+            string path = null;
+            var withoutConvert = expression.RemoveConvert(); // Removes boxing
+            var memberExpression = withoutConvert as MemberExpression;
+            var callExpression = withoutConvert as MethodCallExpression;
+            var anonymous = withoutConvert as dynamic;
+
+            
+             if (memberExpression != null)
             {
                 var parentPath = ParseIncludePath(memberExpression.Expression);
                 if (parentPath == null)
@@ -146,16 +160,20 @@ namespace GraphQLinq
             return graphQuery;
         }
 
-        protected GraphQuery<T> BuildIncludeUnion<TUnion>(Expression<Func<TUnion>> path)
+        protected GraphQuery<T> BuildIncludePossibleType<TUnion>(Expression<Func<T, TUnion>> path)
         {
-            var include = ParseIncludePath(path.Body);
-            if (include?.Path == null)
-            {
-                throw new ArgumentException("Invalid Include Path Expression", nameof(path));
-            }
+            //var include = ParseIncludePathForPossibleTypes(path.Body);
+            //if (include?.Path == null)
+            //{
+            //    throw new ArgumentException("Invalid Include Union Path Expression", nameof(path));
+            //}
+
+            // Get all members that inherit the expressiojn type (UNION models are records that inherit the base record.
+            var possibleTypes = path.Body.Type.GetNestedTypes().Where(m => m.BaseType == path.Body.Type);
+            //var includes = possibleTypes.Select(t => new IncludeDetails { Path = t.Name });
 
             var graphQuery = Clone<T>();
-            graphQuery.Includes.Add(include);
+            graphQuery.Unions.AddRange(possibleTypes);
 
             return graphQuery;
         }
@@ -194,9 +212,9 @@ namespace GraphQLinq
             return (GraphItemQuery<T>)BuildInclude(path);
         }
 
-        public GraphItemQuery<T> IncludeUnion<TUnion>()
+        public GraphItemQuery<T> IncludePossibleType<TPossibleType>(Expression<Func<T, TPossibleType>> path)
         {
-            return (GraphItemQuery<T>)BuildIncludeUnion<TUnion>();
+            return (GraphItemQuery<T>)BuildIncludePossibleType<TPossibleType>(path);
         }
 
         public GraphItemQuery<TResult> Select<TResult>(Expression<Func<T, TResult>> resultSelector)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -52,6 +53,7 @@ namespace GraphQLinq
                 {
                     using (var stream = await response.Content.ReadAsStreamAsync())
                     {
+                        var stringResponse = new StreamReader(stream).ReadToEnd();
                         var document = await JsonDocument.ParseAsync(stream);
 
                         var hasError = document.RootElement.TryGetProperty(ErrorPathPropertyName, out var errorElement);

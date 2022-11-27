@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,7 +17,7 @@ namespace GraphQLinq
 
         internal const string ResultAlias = "result";
 
-        public GraphQLQuery BuildQuery(GraphQuery<T> graphQuery, List<IncludeDetails> includes)
+        public GraphQLQuery BuildQuery(GraphQuery<T> graphQuery, List<IncludeDetails> includes, List<Type> unionDetails)
         {
             var selectClause = "";
 
@@ -60,7 +62,7 @@ namespace GraphQLinq
             }
             else
             {
-                var select = BuildSelectClauseForType(typeof(T), includes);
+                var select = BuildSelectClauseForType(typeof(T), includes, unionDetails);
                 selectClause = select.SelectClause;
 
                 foreach (var item in select.IncludeArguments)
@@ -129,7 +131,34 @@ namespace GraphQLinq
             return selectClause;
         }
 
-        private static SelectClauseDetails BuildSelectClauseForType(Type targetType, List<IncludeDetails> includes)
+        /// <summary>
+        /// Returns all the possible types of a Union Type.
+        /// Union types are records that contain nested types that inherit themselves.
+        /// </summary>
+        /// <param name="unionType"></param>
+        /// <returns></returns>
+        private static IEnumerable<Type> GetPossibleTypes(Type unionType)
+            => unionType.GetNestedTypes().Where(t => t.BaseType == unionType);
+
+        /// <summary>
+        /// Returns the clause for including a possible type on a UNION result.
+        /// This is the "... on" operator and the list of fields to select from it..
+        /// </summary>
+        /// <param name="possibleType"></param>
+        /// <param name="depth"></param>
+        /// <returns></returns>
+        private static string BuildIncludeClauseForPossibleType(Type possibleType, int depth = 1)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            // All properties should be part of the model.
+            var possibleTypes = possibleType.GetProperties();
+
+            var selectClause = string.Join(Environment.NewLine, possibleTypes.Select(t => new string(' ', depth * 2) + t.Name.ToCamelCase()));
+            return $" ...on {possibleType.Name} {{{Environment.NewLine}{selectClause}{Environment.NewLine}}}";
+        }
+
+        private static SelectClauseDetails BuildSelectClauseForType(Type targetType, List<IncludeDetails> includes, List<Type> unionIncludes)
         {
             var selectClause = BuildSelectClauseForType(targetType);
             var includeVariables = new Dictionary<string, object>();
@@ -142,8 +171,85 @@ namespace GraphQLinq
                 var fieldsFromInclude = BuildSelectClauseForInclude(targetType, include, includeVariables, prefix);
                 selectClause = selectClause + Environment.NewLine + fieldsFromInclude;
             }
+
+            // UNIONS
+            for (var index = 0; index < unionIncludes.Count; index++)
+            {
+                var unionInclude = unionIncludes[index];
+                var prefix = unionIncludes.Count == 1 ? "" : index.ToString();
+
+                string unionFields = BuildIncludeClauseForPossibleType(unionInclude);
+                selectClause = selectClause + Environment.NewLine + unionFields;
+            }
+
             return new SelectClauseDetails { SelectClause = selectClause, IncludeArguments = includeVariables };
         }
+
+        private static string BuildSelectClauseForIncludePossibleType(Type targetType, IncludeDetails includeDetails, Dictionary<string, object> includeVariables, string parameterPrefix = "", int parameterIndex = 0, int depth = 1)
+        {
+            //var include = includeDetails.Path;
+            
+            var leftPadding = new string(' ', depth * 2);
+
+            //var dotIndex = include.IndexOf(".", StringComparison.InvariantCultureIgnoreCase);
+
+            //var currentIncludeName = dotIndex >= 0 ? include.Substring(0, dotIndex) : include;
+
+            //var propertyInfo = targetType.GetProperty(currentIncludeName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+            //var includeName = currentIncludeName;
+
+            var possibleTypes = GetPossibleTypes(targetType);
+            var includeQueries = possibleTypes.Select(t => BuildIncludeClauseForPossibleType(t));
+            var selectQuery = $"{leftPadding}{string.Join(Environment.NewLine, includeQueries)}{leftPadding}}}";
+            return selectQuery;
+            //var includeMethodInfo = includeDetails.MethodIncludes.Count > parameterIndex ? includeDetails.MethodIncludes[parameterIndex].Method : null;
+            //var includeByMethod = includeMethodInfo != null && currentIncludeName == includeMethodInfo.Name && propertyInfo.PropertyType == includeMethodInfo.ReturnType;
+
+            //if (includeByMethod)
+            //{
+            //    var methodDetails = includeDetails.MethodIncludes[parameterIndex];
+            //    parameterIndex++;
+
+            //    propertyType = methodDetails.Method.ReturnType.GetTypeOrListType();
+
+            //    var includeMethodParams = methodDetails.Parameters.Where(pair => pair.Value != null).ToList();
+            //    includeName = methodDetails.Method.Name.ToCamelCase();
+
+            //    if (includeMethodParams.Any())
+            //    {
+            //        var includeParameters = string.Join(", ", includeMethodParams.Select(pair => pair.Key + ": $" + pair.Key + parameterPrefix + parameterIndex));
+            //        includeName = $"{includeName}({includeParameters})";
+
+            //        foreach (var item in includeMethodParams)
+            //        {
+            //            includeVariables.Add(item.Key + parameterPrefix + parameterIndex, item.Value);
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    if (propertyInfo != null)
+            //        propertyType = propertyInfo.PropertyType.GetTypeOrListType();
+            //    else
+            //        propertyType = targetType;
+            ////}
+
+            ////if (propertyType.IsValueTypeOrString())
+            ////{
+            ////    return leftPadding + includeName;
+            ////}
+
+            //var restOfTheInclude = new IncludeDetails(includeDetails.MethodIncludes) { Path = dotIndex >= 0 ? include.Substring(dotIndex + 1) : "" };
+
+            //var fieldsFromInclude = BuildSelectClauseForIncludePossibleType(propertyType, restOfTheInclude, includeVariables, parameterPrefix, parameterIndex, depth + 1);
+            ////var fieldsFromInclude = string.Join(" ", propertyType.GetProperties().Select(p => p.Name.ToCamelCase()));
+            //string unionClause = depth == 1 ? " ... on " : "";
+            //includeName = depth == 1 ? includeName : includeName.ToCamelCase();
+            //fieldsFromInclude = $"{leftPadding}{unionClause}{includeName} {{{Environment.NewLine}{fieldsFromInclude}{Environment.NewLine}{leftPadding}}}";
+            //return fieldsFromInclude;
+        }
+    
 
         private static string BuildSelectClauseForInclude(Type targetType, IncludeDetails includeDetails, Dictionary<string, object> includeVariables, string parameterPrefix = "", int parameterIndex = 0, int depth = 1)
         {
