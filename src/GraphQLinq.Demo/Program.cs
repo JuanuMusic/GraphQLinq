@@ -24,42 +24,45 @@ namespace GraphQLinq.Demo
             spaceXContext.JsonSerializerOptions.Converters.Add(new UnixEpochDateTimeConverter());
 
             #region Company details
-            var company = await spaceXContext.Company().ToItem();
+            var company = await spaceXContext.Company()
+                .AddField(c => c.Ceo).ToItem();
 
             RenderCompanyDetails(company);
             #endregion
 
             #region Specific properties of company
             //Use an anonymous type to select specific properties
-            var companySummaryAnonymous = spaceXContext.Company().Select(c => new { c.Ceo, c.Name, c.Headquarters }).ToItem();
+            var companySummaryAnonymous = spaceXContext.Company().ToItem(c => new { c.Ceo, c.Name, c.Headquarters });
 
             //Use data class to select specific properties
-            var companySummary = await spaceXContext.Company().Select(c => new CompanySummary
+            var companySummary = await spaceXContext.Company().ToItem(c => new CompanySummary
             {
                 Ceo = c.Ceo,
                 Name = c.Name,
                 Headquarters = c.Headquarters
-            }).ToItem();
+            });
+            
 
             RenderCompanySummary(companySummary);
             #endregion
 
             #region Include navigation properties
             var companyWithHeadquartersAndLinks = await spaceXContext.Company()
-                                                                .Include(info => info.Headquarters)
-                                                                .Include(info => info.Links).ToItem();
+                                                                .AddField(info => info.Headquarters)
+                                                                .AddField(info => info.Links)
+                                                                .ToItem();
 
             RenderCompanyDetailsAndLinks(companyWithHeadquartersAndLinks);
             #endregion
 
             #region Filter missions, compose queries
             var missionsQuery = spaceXContext.Missions(new MissionsFind { Manufacturer = "Orbital ATK" }, null, null)
-                                                 .Include(mission => mission.Manufacturers);
+                                                 .AddField(mission => mission.Manufacturers);
             var missions = await missionsQuery.ToEnumerable();
 
             RenderMissions(missions);
 
-            var missionsWithPayloads = await missionsQuery.Include(mission => mission.Payloads).ToEnumerable();
+            var missionsWithPayloads = await missionsQuery.AddField(mission => mission.Payloads).ToEnumerable();
 
             RenderMissions(missionsWithPayloads, true);
             #endregion
@@ -67,9 +70,9 @@ namespace GraphQLinq.Demo
             #region Multiple levels of Includes
 
             var launches = await spaceXContext.Launches(null, 10, 0, null, null)
-                                        .Include(launch => launch.Links)
-                                        .Include(launch => launch.Rocket)
-                                        .Include(launch => launch.Rocket.Second_stage.Payloads.Select(payload => payload.Manufacturer))
+                                        .AddField(launch => launch.Links)
+                                        .AddField(launch => launch.Rocket)
+                                        .AddField(launch => launch.Rocket.Second_stage.Payloads.Select(payload => payload.Manufacturer))
                                         .ToEnumerable();
 
             RenderLaunches(launches);

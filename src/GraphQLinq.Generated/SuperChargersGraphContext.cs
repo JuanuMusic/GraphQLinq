@@ -12,14 +12,14 @@ namespace GraphQLinq
         {
             var parameterValues = new object[] { before, after, openSoon, isGallery, boundingBox, first, last, type, region, country };
 
-            return BuildCollectionQuery<Location>(parameterValues);
+            return (GraphCollectionQuery<Location>)BuildCollectionQuery<Location>(parameterValues);
         }
 
         public GraphCollectionQuery<Location> Near(float latitude, float longitude, int? first = null, int? last = null, List<LocationType> type = null, string before = null, string after = null)
         {
             var parameterValues = new object[] { latitude, longitude, first, last, type, before, after };
 
-            return BuildCollectionQuery<Location>(parameterValues);
+            return (GraphCollectionQuery<Location>)BuildCollectionQuery<Location>(parameterValues);
         }
     }
 }

@@ -1,12 +1,14 @@
 namespace SpaceX
 {
     using GraphQL.Client.Http;
+    using GraphQL.Query.Builder;
     using GraphQLinq;
+    using GraphQLinq.QueryExecutors;
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
 
-    public partial class QueryContext : GraphContext
+    public partial class QueryContext : GraphQLClientContext
     {
         public QueryContext() : this("https://api.spacex.land/graphql")
         {
@@ -16,248 +18,248 @@ namespace SpaceX
         {
         }
 
-        public QueryContext(HttpClient gqlClient) : base(gqlClient)
+        public QueryContext(GraphQLHttpClient gqlClient) : base(gqlClient)
         {
         }
 
-        public GraphCollectionQuery<Users> Users(List<Users_select_column> distinct_on, int? limit, int? offset, List<Users_order_by> order_by, Users_bool_exp where)
+        public ContextualizedQuery<IEnumerable<Users>> Users(List<Users_select_column> distinct_on, int? limit, int? offset, List<Users_order_by> order_by, Users_bool_exp where)
         {
             var parameterValues = new object[] { distinct_on, limit, offset, order_by, where };
-            return BuildCollectionQuery<Users>(parameterValues, "users");
+            return (ContextualizedQuery<IEnumerable<Users>>)BuildCollectionQuery<Users>(parameterValues, "users");
         }
 
-        public GraphItemQuery<Users_aggregate> Users_aggregate(List<Users_select_column> distinct_on, int? limit, int? offset, List<Users_order_by> order_by, Users_bool_exp where)
+        public ContextualizedQuery<Users_aggregate> Users_aggregate(List<Users_select_column> distinct_on, int? limit, int? offset, List<Users_order_by> order_by, Users_bool_exp where)
         {
             var parameterValues = new object[] { distinct_on, limit, offset, order_by, where };
-            return BuildItemQuery<Users_aggregate>(parameterValues, "users_aggregate");
+            return (ContextualizedQuery<Users_aggregate>)BuildItemQuery<Users_aggregate>(parameterValues, "users_aggregate");
         }
 
-        public GraphItemQuery<Users> Users_by_pk(Guid id)
+        public ContextualizedQuery<Users> Users_by_pk(Guid id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Users>(parameterValues, "users_by_pk");
+            return (ContextualizedQuery<Users>)BuildItemQuery<Users>(parameterValues, "users_by_pk");
         }
 
-        public GraphCollectionQuery<Capsule> Capsules(CapsulesFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Capsule> Capsules(CapsulesFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Capsule>(parameterValues, "capsules");
+            return (ContextualizedQuery<Capsule>)BuildCollectionQuery<Capsule>(parameterValues, "capsules");
         }
 
-        public GraphCollectionQuery<Capsule> CapsulesPast(CapsulesFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Capsule> CapsulesPast(CapsulesFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Capsule>(parameterValues, "capsulesPast");
+            return (ContextualizedQuery<Capsule>)BuildCollectionQuery<Capsule>(parameterValues, "capsulesPast");
         }
 
-        public GraphCollectionQuery<Capsule> CapsulesUpcoming(CapsulesFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Capsule> CapsulesUpcoming(CapsulesFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Capsule>(parameterValues, "capsulesUpcoming");
+            return (ContextualizedQuery<Capsule>)BuildCollectionQuery<Capsule>(parameterValues, "capsulesUpcoming");
         }
 
-        public GraphItemQuery<Capsule> Capsule(string id)
+        public ContextualizedQuery<Capsule> Capsule(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Capsule>(parameterValues, "capsule");
+            return (ContextualizedQuery<Capsule>)BuildItemQuery<Capsule>(parameterValues, "capsule");
         }
 
-        public GraphItemQuery<Info> Company()
+        public ContextualizedQuery<Info> Company()
         {
             var parameterValues = new object[] { };
-            return BuildItemQuery<Info>(parameterValues, "company");
+            return (ContextualizedQuery<Info>)BuildItemQuery<Info>(parameterValues, "company");
         }
 
-        public GraphCollectionQuery<Core> Cores(CoresFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Core> Cores(CoresFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Core>(parameterValues, "cores");
+            return (ContextualizedQuery<Core>)BuildCollectionQuery<Core>(parameterValues, "cores");
         }
 
-        public GraphCollectionQuery<Core> CoresPast(CoresFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Core> CoresPast(CoresFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Core>(parameterValues, "coresPast");
+            return (ContextualizedQuery<Core>)BuildCollectionQuery<Core>(parameterValues, "coresPast");
         }
 
-        public GraphCollectionQuery<Core> CoresUpcoming(CoresFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Core> CoresUpcoming(CoresFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Core>(parameterValues, "coresUpcoming");
+            return (ContextualizedQuery<Core>)BuildCollectionQuery<Core>(parameterValues, "coresUpcoming");
         }
 
-        public GraphItemQuery<Core> Core(string id)
+        public ContextualizedQuery<Core> Core(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Core>(parameterValues, "core");
+            return (ContextualizedQuery<Core>)BuildItemQuery<Core>(parameterValues, "core");
         }
 
-        public GraphCollectionQuery<Dragon> Dragons(int? limit, int? offset)
+        public ContextualizedQuery<Dragon> Dragons(int? limit, int? offset)
         {
             var parameterValues = new object[] { limit, offset };
-            return BuildCollectionQuery<Dragon>(parameterValues, "dragons");
+            return (ContextualizedQuery<Dragon>)BuildCollectionQuery<Dragon>(parameterValues, "dragons");
         }
 
-        public GraphItemQuery<Dragon> Dragon(string id)
+        public ContextualizedQuery<Dragon> Dragon(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Dragon>(parameterValues, "dragon");
+            return (ContextualizedQuery<Dragon>)BuildItemQuery<Dragon>(parameterValues, "dragon");
         }
 
-        public GraphCollectionQuery<History> Histories(HistoryFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<History> Histories(HistoryFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<History>(parameterValues, "histories");
+            return (ContextualizedQuery<History>)BuildCollectionQuery<History>(parameterValues, "histories");
         }
 
-        public GraphItemQuery<HistoriesResult> HistoriesResult(HistoryFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<HistoriesResult> HistoriesResult(HistoryFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildItemQuery<HistoriesResult>(parameterValues, "historiesResult");
+            return (ContextualizedQuery<HistoriesResult>)BuildItemQuery<HistoriesResult>(parameterValues, "historiesResult");
         }
 
-        public GraphItemQuery<History> History(string id)
+        public ContextualizedQuery<History> History(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<History>(parameterValues, "history");
+            return (ContextualizedQuery<History>)BuildItemQuery<History>(parameterValues, "history");
         }
 
-        public GraphCollectionQuery<Landpad> Landpads(int? limit, int? offset)
+        public ContextualizedQuery<Landpad> Landpads(int? limit, int? offset)
         {
             var parameterValues = new object[] { limit, offset };
-            return BuildCollectionQuery<Landpad>(parameterValues, "landpads");
+            return (ContextualizedQuery<Landpad>)BuildCollectionQuery<Landpad>(parameterValues, "landpads");
         }
 
-        public GraphItemQuery<Landpad> Landpad(string id)
+        public ContextualizedQuery<Landpad> Landpad(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Landpad>(parameterValues, "landpad");
+            return (ContextualizedQuery<Landpad>)BuildItemQuery<Landpad>(parameterValues, "landpad");
         }
 
-        public GraphCollectionQuery<Launch> Launches(LaunchFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Launch> Launches(LaunchFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Launch>(parameterValues, "launches");
+            return (ContextualizedQuery<Launch>)BuildCollectionQuery<Launch>(parameterValues, "launches");
         }
 
-        public GraphCollectionQuery<Launch> LaunchesPast(LaunchFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Launch> LaunchesPast(LaunchFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Launch>(parameterValues, "launchesPast");
+            return (ContextualizedQuery<Launch>)BuildCollectionQuery<Launch>(parameterValues, "launchesPast");
         }
 
-        public GraphItemQuery<LaunchesPastResult> LaunchesPastResult(LaunchFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<LaunchesPastResult> LaunchesPastResult(LaunchFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildItemQuery<LaunchesPastResult>(parameterValues, "launchesPastResult");
+            return (ContextualizedQuery<LaunchesPastResult>)BuildItemQuery<LaunchesPastResult>(parameterValues, "launchesPastResult");
         }
 
-        public GraphCollectionQuery<Launch> LaunchesUpcoming(LaunchFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Launch> LaunchesUpcoming(LaunchFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Launch>(parameterValues, "launchesUpcoming");
+            return (ContextualizedQuery<Launch>)BuildCollectionQuery<Launch>(parameterValues, "launchesUpcoming");
         }
 
-        public GraphItemQuery<Launch> Launch(string id)
+        public ContextualizedQuery<Launch> Launch(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Launch>(parameterValues, "launch");
+            return (ContextualizedQuery<Launch>)BuildItemQuery<Launch>(parameterValues, "launch");
         }
 
-        public GraphItemQuery<Launch> LaunchLatest(int? offset)
+        public ContextualizedQuery<Launch> LaunchLatest(int? offset)
         {
             var parameterValues = new object[] { offset };
-            return BuildItemQuery<Launch>(parameterValues, "launchLatest");
+            return (ContextualizedQuery<Launch>)BuildItemQuery<Launch>(parameterValues, "launchLatest");
         }
 
-        public GraphItemQuery<Launch> LaunchNext(int? offset)
+        public ContextualizedQuery<Launch> LaunchNext(int? offset)
         {
             var parameterValues = new object[] { offset };
-            return BuildItemQuery<Launch>(parameterValues, "launchNext");
+            return (ContextualizedQuery<Launch>)BuildItemQuery<Launch>(parameterValues, "launchNext");
         }
 
-        public GraphCollectionQuery<Launchpad> Launchpads(int? limit, int? offset)
+        public ContextualizedQuery<Launchpad> Launchpads(int? limit, int? offset)
         {
             var parameterValues = new object[] { limit, offset };
-            return BuildCollectionQuery<Launchpad>(parameterValues, "launchpads");
+            return (ContextualizedQuery<Launchpad>)BuildCollectionQuery<Launchpad>(parameterValues, "launchpads");
         }
 
-        public GraphItemQuery<Launchpad> Launchpad(string id)
+        public ContextualizedQuery<Launchpad> Launchpad(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Launchpad>(parameterValues, "launchpad");
+            return (ContextualizedQuery<Launchpad>)BuildItemQuery<Launchpad>(parameterValues, "launchpad");
         }
 
-        public GraphCollectionQuery<Mission> Missions(MissionsFind find, int? limit, int? offset)
+        public ContextualizedQuery<Mission> Missions(MissionsFind find, int? limit, int? offset)
         {
             var parameterValues = new object[] { find, limit, offset };
-            return BuildCollectionQuery<Mission>(parameterValues, "missions");
+            return (ContextualizedQuery<Mission>)BuildCollectionQuery<Mission>(parameterValues, "missions");
         }
 
-        public GraphItemQuery<MissionResult> MissionsResult(MissionsFind find, int? limit, int? offset)
+        public ContextualizedQuery<MissionResult> MissionsResult(MissionsFind find, int? limit, int? offset)
         {
             var parameterValues = new object[] { find, limit, offset };
-            return BuildItemQuery<MissionResult>(parameterValues, "missionsResult");
+            return (ContextualizedQuery<MissionResult>)BuildItemQuery<MissionResult>(parameterValues, "missionsResult");
         }
 
-        public GraphItemQuery<Mission> Mission(string id)
+        public ContextualizedQuery<Mission> Mission(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Mission>(parameterValues, "mission");
+            return (ContextualizedQuery<Mission>)BuildItemQuery<Mission>(parameterValues, "mission");
         }
 
-        public GraphCollectionQuery<Payload> Payloads(PayloadsFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Payload> Payloads(PayloadsFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Payload>(parameterValues, "payloads");
+            return (ContextualizedQuery<Payload>)BuildCollectionQuery<Payload>(parameterValues, "payloads");
         }
 
-        public GraphItemQuery<Payload> Payload(string id)
+        public ContextualizedQuery<Payload> Payload(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Payload>(parameterValues, "payload");
+            return (ContextualizedQuery<Payload>)BuildItemQuery<Payload>(parameterValues, "payload");
         }
 
-        public GraphItemQuery<Roadster> Roadster()
+        public ContextualizedQuery<Roadster> Roadster()
         {
             var parameterValues = new object[] { };
-            return BuildItemQuery<Roadster>(parameterValues, "roadster");
+            return (ContextualizedQuery<Roadster>)BuildItemQuery<Roadster>(parameterValues, "roadster");
         }
 
-        public GraphCollectionQuery<Rocket> Rockets(int? limit, int? offset)
+        public ContextualizedQuery<Rocket> Rockets(int? limit, int? offset)
         {
             var parameterValues = new object[] { limit, offset };
-            return BuildCollectionQuery<Rocket>(parameterValues, "rockets");
+            return (ContextualizedQuery<Rocket>)BuildCollectionQuery<Rocket>(parameterValues, "rockets");
         }
 
-        public GraphItemQuery<RocketsResult> RocketsResult(int? limit, int? offset)
+        public ContextualizedQuery<RocketsResult> RocketsResult(int? limit, int? offset)
         {
             var parameterValues = new object[] { limit, offset };
-            return BuildItemQuery<RocketsResult>(parameterValues, "rocketsResult");
+            return (ContextualizedQuery<RocketsResult>)BuildItemQuery<RocketsResult>(parameterValues, "rocketsResult");
         }
 
-        public GraphItemQuery<Rocket> Rocket(string id)
+        public ContextualizedQuery<Rocket> Rocket(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Rocket>(parameterValues, "rocket");
+            return (ContextualizedQuery<Rocket>)BuildItemQuery<Rocket>(parameterValues, "rocket");
         }
 
-        public GraphCollectionQuery<Ship> Ships(ShipsFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<Ship> Ships(ShipsFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildCollectionQuery<Ship>(parameterValues, "ships");
+            return (ContextualizedQuery<Ship>)BuildCollectionQuery<Ship>(parameterValues, "ships");
         }
 
-        public GraphItemQuery<ShipsResult> ShipsResult(ShipsFind find, int? limit, int? offset, string order, string sort)
+        public ContextualizedQuery<ShipsResult> ShipsResult(ShipsFind find, int? limit, int? offset, string order, string sort)
         {
             var parameterValues = new object[] { find, limit, offset, order, sort };
-            return BuildItemQuery<ShipsResult>(parameterValues, "shipsResult");
+            return (ContextualizedQuery<ShipsResult>)BuildItemQuery<ShipsResult>(parameterValues, "shipsResult");
         }
 
-        public GraphItemQuery<Ship> Ship(string id)
+        public ContextualizedQuery<Ship> Ship(string id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<Ship>(parameterValues, "ship");
+            return (ContextualizedQuery<Ship>)BuildItemQuery<Ship>(parameterValues, "ship");
         }
     }
 }

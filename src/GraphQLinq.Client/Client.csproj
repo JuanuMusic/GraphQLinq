@@ -27,6 +27,10 @@
     <PackageReleaseNotes>Added suppport for async/await. 
       Migrated from WebClient to HttpClient. 
       Migrated from Newtonsoft.Json to System.Text.Json</PackageReleaseNotes>
+    <RootNamespace>GraphQLinq</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AssemblyName>GraphQLinq.Client</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
@@ -37,6 +41,7 @@
     <PackageReference Include="GraphQL.Client" Version="5.1.0" />
     <PackageReference Include="GraphQL" Version="7.1.1" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="5.1.0" />
+    <PackageReference Include="GraphQL.Query.Builder" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="GraphQL.Client" />
@@ -45,6 +50,7 @@
     <None Remove="GraphQL" />
     <None Remove="GraphQL.Client.Serializer.Newtonsoft" />
     <None Remove="GraphQL.Client.Serializer.SystemTextJson" />
+    <None Remove="GraphQL.Query.Builder" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\Images\Icon.png">

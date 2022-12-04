@@ -10,4 +10,10 @@
   <ItemGroup>
     <ProjectReference Include="..\GraphQLinq.Client\Client.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="GraphQL.Query.Builder" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="GraphQL.Query.Builder" Version="2.0.1" />
+  </ItemGroup>
 </Project>

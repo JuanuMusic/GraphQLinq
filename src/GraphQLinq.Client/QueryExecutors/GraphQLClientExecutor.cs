@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GraphQL;
+using GraphQLinq.QueryExecutors;
 
 namespace GraphQLinq
 {
@@ -32,7 +33,7 @@ namespace GraphQLinq
             if (queryType == QueryType.Item)
             {
 
-                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<T>>(new GraphQLRequest { Query = query.Query, Variables = query.Variables });
+                var res = await context.Client.SendQueryAsync<ResultModel<T>>(new GraphQLRequest { Query = query.Query, Variables = query.Variables });
                 if(res.Errors != null && res.Errors.Length > 0)
                     throw new Exception(res.Errors[0].Message);
                 
@@ -40,7 +41,7 @@ namespace GraphQLinq
             }
             else
             {
-                var res = await context.GraphQLClient.SendQueryAsync<ResultModel<IEnumerable<T>>>(new GraphQLRequest { Query = query.Query, Variables = query.Variables });
+                var res = await context.Client.SendQueryAsync<ResultModel<IEnumerable<T>>>(new GraphQLRequest { Query = query.Query, Variables = query.Variables });
                 if (res.Errors != null && res.Errors.Length > 0)
                     throw new Exception(res.Errors[0].Message);
                 return (default(T), res.Data.Result);

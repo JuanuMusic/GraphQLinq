@@ -47,7 +47,7 @@ namespace GraphQLinq
         {
             using (var content = new StringContent(query.FullQuery, Encoding.UTF8, "application/json"))
             {
-                using (var response = await context.HttpClient.PostAsync("", content))
+                using (var response = await context.Client.PostAsync("", content))
                 {
                     using (var stream = await response.Content.ReadAsStreamAsync())
                     {

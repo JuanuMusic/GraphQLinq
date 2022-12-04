@@ -1,5 +1,6 @@
 namespace TestServer
 {
+    using GraphQL.Query.Builder;
     using GraphQLinq;
     using System;
     using System.Collections.Generic;
@@ -14,22 +15,22 @@ namespace TestServer
         {
         }
 
-        public GraphItemQuery<User> UserTemporaryFixForNullable(int? id)
+        public IQuery<User> UserTemporaryFixForNullable(int? id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<User>(parameterValues, "userTemporaryFixForNullable");
+            return (IQuery<User>)BuildItemQuery<User>(parameterValues, "userTemporaryFixForNullable");
         }
 
-        public GraphItemQuery<User> User(int id)
+        public IQuery<User> User(int id)
         {
             var parameterValues = new object[] { id };
-            return BuildItemQuery<User>(parameterValues, "user");
+            return (IQuery<User>)BuildItemQuery<User>(parameterValues, "user");
         }
 
-        public GraphItemQuery<User> FailUser()
+        public IQuery<User> FailUser()
         {
             var parameterValues = new object[] { };
-            return BuildItemQuery<User>(parameterValues, "failUser");
+            return (IQuery<User>)BuildItemQuery<User>(parameterValues, "failUser");
         }
     }
 }
