@@ -103,7 +103,7 @@ namespace GraphQLinq
 
             throw new InvalidCastException($"Cannot cast {query} to {typeof(ContextualizedQuery<T>)}");
         }
-        x
+        
         public static async Task<IEnumerable<T>> ToEnumerable<T>(this IQuery<T> query)
         {
             if (query is ContextualizedQuery<T>)
